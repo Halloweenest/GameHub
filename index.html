@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameHub - Your Games. Your World.</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #10121b;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+header {
+  background: #191c29;
+  padding: 18px 6%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid #292d40;
+}
+.logo { font-size: 27px; font-weight: 900; }
+.logo span { color: #8b72ff; }
+nav { display: flex; gap: 18px; }
+nav a { color: #c6c7d2; text-decoration: none; cursor: pointer; }
+nav a:hover { color: white; }
+.hero {
+  padding: 65px 6%;
+  background: linear-gradient(120deg, #292052, #171c36 65%, #182c43);
+}
+.hero h1 { font-size: clamp(36px, 6vw, 64px); margin: 0 0 12px; }
+.hero h1 span { color: #a18cff; }
+.hero p { color: #d0cde5; font-size: 17px; }
+.search {
+  margin-top: 25px;
+  padding: 14px 18px;
+  width: min(440px, 100%);
+  border: 1px solid #555174;
+  border-radius: 10px;
+  background: #111322;
+  color: white;
+  font-size: 16px;
+}
+main { padding: 32px 6%; }
+.categories { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 28px; }
+.category {
+  border: 1px solid #35394c;
+  background: #1c2030;
+  color: #d6d7e3;
+  border-radius: 22px;
+  padding: 10px 17px;
+  cursor: pointer;
+}
+.category.active, .category:hover { background: #7658e8; color: white; border-color: #7658e8; }
+.section-title { margin: 0 0 18px; font-size: 25px; }
+.games {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+.game-card {
+  background: #1b1f2e;
+  border: 1px solid #2d3245;
+  border-radius: 14px;
+  overflow: hidden;
+  transition: transform .2s, border-color .2s;
+}
+.game-card:hover { transform: translateY(-4px); border-color: #8067ee; }
+.game-art {
+  height: 145px;
+  display: grid;
+  place-items: center;
+  font-size: 65px;
+}
+.purple { background: linear-gradient(135deg,#4931a0,#a15ed0); }
+.blue { background: linear-gradient(135deg,#17658c,#42b7c6); }
+.orange { background: linear-gradient(135deg,#a64b24,#e5a23f); }
+.green { background: linear-gradient(135deg,#176b50,#6abf78); }
+.card-info { padding: 16px; }
+.card-info h3 { margin: 0 0 7px; }
+.card-info p { color: #aeb2c5; font-size: 13px; margin: 0 0 14px; }
+.card-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.play, .favorite {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.play { background: #8065ed; color: white; }
+.play:hover { background: #987fff; }
+.favorite { background: #303449; color: white; font-size: 17px; }
+#game-area {
+  display: none;
+  margin-top: 35px;
+  padding: 24px;
+  background: #1b1f2e;
+  border: 1px solid #414664;
+  border-radius: 14px;
+  text-align: center;
+}
+#game-area h2 { margin-top: 0; }
+.game-button {
+  background: #8065ed;
+  color: white;
+  border: 0;
+  border-radius: 9px;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 7px;
+}
+.game-input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #555;
+  background: #10121b;
+  color: white;
+  font-size: 17px;
+  width: 110px;
+}
+#reaction-box {
+  background: #b63d54;
+  padding: 45px 15px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 21px;
+  font-weight: bold;
+}
+footer { text-align: center; padding: 35px; color: #85899d; }
+@media(max-width:600px) {
+  header { flex-wrap: wrap; }
+  nav { width: 100%; }
+  .hero { padding-top: 45px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">GAME<span>HUB</span></div>
+  <nav>
+    <a onclick="showCategory('All')">Home</a>
+    <a onclick="showCategory('Arcade')">Arcade</a>
+    <a onclick="showCategory('Puzzle')">Puzzle</a>
+    <a onclick="showCategory('Favorites')">Favorites ♥</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h1>YOUR GAMES.<br><span>YOUR WORLD.</span></h1>
+  <p>Discover games, challenge yourself, and have fun.</p>
+  <input class="search" id="search" placeholder="🔎 Search games..." oninput="renderGames()">
+</section>
+
+<main>
+  <h2 class="section-title">Explore Games</h2>
+  <div class="categories">
+    <button class="category active" onclick="showCategory('All',this)">All Games</button>
+    <button class="category" onclick="showCategory('Arcade',this)">Arcade</button>
+    <button class="category" onclick="showCategory('Puzzle',this)">Puzzle</button>
+    <button class="category" onclick="showCategory('Favorites',this)">♥ Favorites</button>
+  </div>
+
+  <div class="games" id="games"></div>
+
+  <section id="game-area">
+    <h2 id="game-title">Game</h2>
+    <div id="game-content"></div>
+    <button class="game-button" onclick="closeGame()">← Back to games</button>
+  </section>
+</main>
+
+<footer>© 2026 GAMEHUB · YOUR GAMES. YOUR WORLD.</footer>
+
+<script>
+const gameList = [
+  {id:'reaction',name:'Reaction Rush',description:'How fast are your reflexes?',category:'Arcade',emoji:'⚡',color:'purple'},
+  {id:'guess',name:'Number Quest',description:'Can you guess the secret number?',category:'Puzzle',emoji:'🔢',color:'blue'},
+  {id:'target',name:'Target Tap',description:'Hit the target as many times as you can!',category:'Arcade',emoji:'🎯',color:'orange'},
+  {id:'memory',name:'Memory Match',description:'Test your memory with emojis.',category:'Puzzle',emoji:'🧠',color:'green'}
+];
+let category = 'All';
+let favorites = JSON.parse(localStorage.getItem('gamehub-favorites') || '[]');
+let reactionTimer, reactionStart, targetScore = 0, targetTime;
+
+function renderGames() {
+  const query = document.getElementById('search').value.toLowerCase();
+  const list = gameList.filter(g =>
+    (category === 'All' || (category === 'Favorites' ? favorites.includes(g.id) : g.category === category)) &&
+    (g.name.toLowerCase().includes(query) || g.description.toLowerCase().includes(query))
+  );
+  document.getElementById('games').innerHTML = list.length ? list.map(g => `
+    <article class="game-card">
+      <div class="game-art ${g.color}">${g.emoji}</div>
+      <div class="card-info">
+        <h3>${g.name}</h3>
+        <p>${g.description}</p>
+        <div class="card-actions">
+          <button class="play" onclick="openGame('${g.id}')">▶ Play</button>
+          <button class="favorite" onclick="toggleFavorite('${g.id}')" title="Favorite">${favorites.includes(g.id) ? '♥' : '♡'}</button>
+        </div>
+      </div>
+    </article>`).join('') : '<p>No games found. Try another search!</p>';
+}
+function showCategory(c,button) {
+  category = c;
+  document.querySelectorAll('.category').forEach(b => b.classList.remove('active'));
+  if(button) button.classList.add('active');
+  renderGames();
+}
+function toggleFavorite(id) {
+  favorites = favorites.includes(id) ? favorites.filter(x => x !== id) : [...favorites,id];
+  localStorage.setItem('gamehub-favorites',JSON.stringify(favorites));
+  renderGames();
+}
+function openGame(id) {
+  const area = document.getElementById('game-area');
+  area.style.display = 'block';
+  area.scrollIntoView({behavior:'smooth'});
+  const game = gameList.find(g => g.id === id);
+  document.getElementById('game-title').textContent = game.name;
+  const content = document.getElementById('game-content');
+  if(id === 'reaction') reactionGame(content);
+  if(id === 'guess') guessGame(content);
+  if(id === 'target') targetGame(content);
+  if(id === 'memory') memoryGame(content);
+}
+function closeGame() {
+  document.getElementById('game-area').style.display = 'none';
+  clearTimeout(reactionTimer);
+  clearInterval(targetTime);
+}
+function reactionGame(el) {
+  el.innerHTML = `<p>Click the box when it turns GREEN. Don't click too early!</p>
+  <div id="reaction-box">Click START to begin</div><h3 id="reaction-result"></h3>
+  <button class="game-button" onclick="startReaction()">Start</button>`;
+}
+function startReaction() {
+  clearTimeout(reactionTimer);
+  const box = document.getElementById('reaction-box');
+  const result = document.getElementById('reaction-result');
+  box.style.background = '#b63d54';
+  box.textContent = 'Wait for green...';
+  result.textContent = '';
+  box.onclick = () => {
+    if(!reactionStart) { result.textContent = 'Too early! Try again.'; clearTimeout(reactionTimer); return; }
+    result.textContent = 'Your reaction time: ' + (Date.now()-reactionStart) + ' ms!';
+    reactionStart = null;
+    box.onclick = null;
+  };
+  reactionStart = null;
+  reactionTimer = setTimeout(() => {
+    reactionStart = Date.now();
+    box.style.background = '#279c66';
+    box.textContent = 'CLICK NOW!';
+  }, 1000 + Math.random()*3000);
+}
+function guessGame(el) {
+  const secret = Math.floor(Math.random()*100)+1;
+  el.innerHTML = `<p>I'm thinking of a number from 1 to 100.</p>
+  <input class="game-input" id="guess-input" type="number" min="1" max="100" placeholder="1–100">
+  <button class="game-button" onclick="checkGuess(${secret})">Guess!</button>
+  <h3 id="guess-result">Good luck!</h3>`;
+}
+function checkGuess(secret) {
+  const value = Number(document.getElementById('guess-input').value);
+  const result = document.getElementById('guess-result');
+  if(!value || value < 1 || value > 100) { result.textContent = 'Enter a number from 1 to 100!'; return; }
+  if(value === secret) { result.textContent = '🎉 You got it!'; }
+  else result.textContent = value < secret ? 'Too low! Try higher.' : 'Too high! Try lower.';
+}
+function targetGame(el) {
+  targetScore = 0;
+  el.innerHTML = `<p>Click the target as many times as you can in 15 seconds!</p>
+  <h3 id="target-score">Score: 0</h3><h3 id="target-clock">Time: 15</h3>
+  <button class="game-button" onclick="startTarget()">Start game</button>
+  <div id="target-zone"></div>`;
+}
+function startTarget() {
+  clearInterval(targetTime);
+  let seconds = 15;
+  targetScore = 0;
+  document.getElementById('target-score').textContent = 'Score: 0';
+  document.getElementById('target-clock').textContent = 'Time: 15';
+  const zone = document.getElementById('target-zone');
+  function spawn() {
+    zone.innerHTML = '<button class="game-button" style="font-size:30px" onclick="hitTarget()">🎯</button>';
+  }
+  spawn();
+  targetTime = setInterval(() => {
+    seconds--;
+    document.getElementById('target-clock').textContent = 'Time: '+seconds;
+    if(seconds <= 0) {
+      clearInterval(targetTime);
+      zone.innerHTML = '<h3>Time is up! Final score: '+targetScore+'</h3>';
+    }
+  },1000);
+  window.hitTarget = function() {
+    targetScore++;
+    document.getElementById('target-score').textContent = 'Score: '+targetScore;
+    spawn();
+  };
+}
+function memoryGame(el) {
+  const emojis = ['🐶','🐢','🍕','🚀','⚽','🐶','🐢','🍕','🚀','⚽'];
+  emojis.sort(() => Math.random()-.5);
+  let opened = [], matched = [];
+  el.innerHTML = `<p>Find all five matching pairs!</p><div id="memory-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:420px;margin:20px auto"></div><h3 id="memory-result"></h3>`;
+  const grid = document.getElementById('memory-grid');
+  emojis.forEach((emoji,i) => {
+    const b = document.createElement('button');
+    b.className = 'game-button';
+    b.style.fontSize = '25px';
+    b.textContent = '❔';
+    b.onclick = () => {
+      if(opened.length===2 || matched.includes(i) || opened.some(x=>x.i===i)) return;
+      b.textContent = emoji;
+      opened.push({i,emoji,b});
+      if(opened.length===2) {
+        if(opened[0].emoji===opened[1].emoji) {
+          opened.forEach(x=>matched.push(x.i));
+          opened=[];
+          if(matched.length===10) document.getElementById('memory-result').textContent='🎉 You matched them all!';
+        } else {
+          setTimeout(()=>{opened.forEach(x=>x.b.textContent='❔');opened=[];},700);
+        }
+      }
+    };
+    grid.appendChild(b);
+  });
+}
+renderGames();
+</script>
+</body>
+</html>
